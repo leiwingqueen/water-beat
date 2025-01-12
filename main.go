@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 )
 
 func parseCSV(filePath string) ([]match, error) {
@@ -22,12 +23,13 @@ func parseCSV(filePath string) ([]match, error) {
 
 	var matches []match
 	for _, record := range records {
-		score1, _ := strconv.Atoi(record[2])
-		score2, _ := strconv.Atoi(record[3])
-		water, _ := strconv.Atoi(record[4])
+		scores := strings.Split(record[4], ":")
+		score1, _ := strconv.Atoi(scores[0])
+		score2, _ := strconv.Atoi(scores[1])
+		water, _ := strconv.Atoi(record[5])
 		matches = append(matches, match{
 			team1:  team{record[0], record[1]},
-			team2:  team{record[5], record[6]},
+			team2:  team{record[2], record[3]},
 			score1: score1,
 			score2: score2,
 			water:  water,
@@ -38,7 +40,11 @@ func parseCSV(filePath string) ([]match, error) {
 }
 
 func main() {
-	filePath := "path/to/your/file.csv"
+	if len(os.Args) < 2 {
+		fmt.Println("Usage: program <csv_file_path>")
+		return
+	}
+	filePath := os.Args[1]
 	matches, err := parseCSV(filePath)
 	if err != nil {
 		fmt.Println("Error:", err)
